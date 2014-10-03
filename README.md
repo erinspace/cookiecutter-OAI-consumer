@@ -1,4 +1,7 @@
 cookiecutter-OAI-consumer
 =========================
 
-Cookiecutter to create an OAI consumer for the SHARE project with all necessary components
+You can use this cookiecutter template to create a very basic consumer for the SHARE project,if the API you're writing for uses the OAI-DC metadata format. 
+
+Here's how to create your own OAI consumer: 
+ ... coming soon ...
