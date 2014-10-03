@@ -17,7 +17,9 @@ from scrapi.linter.document import RawDocument, NormalizedDocument
 TODAY = date.today()
 NAME = '{{cookiecutter.shortName}}'
 OAI_DC_BASE_URL = '{{cookiecutter.oaiDcBase}}'
-NAMESPACES = '{{cookiecutter.namespaces}}'
+NAMESPACES = {'dc': 'http://purl.org/dc/elements/1.1/', 
+            'oai_dc': 'http://www.openarchives.org/OAI/2.0/',
+            'ns0': 'http://www.openarchives.org/OAI/2.0/'}
 DEFAULT = datetime(1970, 01, 01)
 
 def consume(days_back=1):
@@ -121,7 +123,7 @@ def normalize(raw_doc, timestamp):
     doc = raw_doc.get('doc')
     record = etree.XML(doc)
 
-    if '{{hasRestrictedSets}}' == 'True':
+    if '{{cookiecutter.hasRestrictedSets}}' == 'True':
         # # load the list of approved series_names as a file
         with open(os.path.join(os.path.dirname(__file__), '{{cookiecutter.approvedSeriesNamesFilename}}')) as series_names:
             series_name_list = [word.replace('\n', '') for word in series_names]
