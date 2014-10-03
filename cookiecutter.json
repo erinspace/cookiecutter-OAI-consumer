@@ -8,7 +8,9 @@
             "oai_dc": "http://www.openarchives.org/OAI/2.0/",
             "ns0": "http://www.openarchives.org/OAI/2.0/"
         },
-    "metadataPrefix": "oai_dc", 
+    "metadataPrefix": "oai_dc",
+    "hasRestrictedSets": "True",
+    "approvedSeriesNamesFilename": "series_names.txt",
     "days": "mon-sun",
     "hour": 23,
     "minute": 59,
