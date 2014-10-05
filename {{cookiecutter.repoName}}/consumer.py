@@ -39,9 +39,9 @@ def copy_to_unicode(element):
 def consume(days_back=1):
     start_date = TODAY - timedelta(days_back)
     url = OAI_DC_BASE_URL + '&metadataPrefix={{cookiecutter.metadataPrefix}}&from='
-    if '{{cookiecutter.dateGranularity}}' == 'YYYY-MM-DDThh:mm:ssZ'
+    if '{{cookiecutter.dateGranularity}}' == 'YYYY-MM-DDThh:mm:ssZ':
         url += str(start_date) + 'T00:00:00Z'
-    else if '{{cookiecutter.dateGranularity}}' == 'YYYY-MM-DD hh:mm:ss':
+    elif '{{cookiecutter.dateGranularity}}' == 'YYYY-MM-DD hh:mm:ss':
         url += str(start_date) + ' 00:00:00'
     else:
         url += str(start_date)
@@ -120,8 +120,7 @@ def get_properties(record):
         'type': type,
         'source': source,
         'format': format,
-        'publisher': publisher,
-        },
+        'publisher': publisher
     }
 
     for key, value in properties.iteritems():
@@ -154,7 +153,7 @@ def normalize(raw_doc, timestamp):
             print('Series not in approved list, not normalizing...')
             return None
 
-    title = record.xpath('//dc:title/node()', namespaces=NAMESPACES)[0]
+    title = (record.xpath('//dc:title/node()', namespaces=NAMESPACES) or [''])[0]
     description = (record.xpath('ns0:metadata/oai_dc:dc/dc:description/node()', namespaces=NAMESPACES) or [''])[0]
 
     normalized_dict = {
@@ -167,7 +166,7 @@ def normalize(raw_doc, timestamp):
         'source': NAME,
         'dateUpdated': get_date_updated(record),
         'dateCreated': get_date_created(record),
-        'timestamp': timestamp,
+        'timestamp': timestamp
     }
 
     return NormalizedDocument(normalized_dict)
