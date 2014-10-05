@@ -1,4 +1,5 @@
 ''' Consumer for {{cookiecutter.longName}} '''
+from __future__ import unicode_literals
 
 import os
 import time
@@ -22,6 +23,19 @@ NAMESPACES = {'dc': 'http://purl.org/dc/elements/1.1/',
             'ns0': 'http://www.openarchives.org/OAI/2.0/'}
 DEFAULT = datetime(1970, 01, 01)
 
+DEFAULT_ENCODING = 'UTF-8'
+
+record_encoding = None
+
+def copy_to_unicode(element):
+
+    encoding = record_encoding or DEFAULT_ENCODING
+    element = ''.join(element)
+    if isinstance(element, unicode):
+        return element
+    else:
+        return unicode(element, encoding=encoding)
+
 def consume(days_back=1):
     start_date = TODAY - timedelta(days_back)
     url = OAI_DC_BASE_URL + '&metadataPrefix={{cookiecutter.metadataPrefix}}&from='
@@ -32,18 +46,19 @@ def consume(days_back=1):
     else:
         url += str(start_date)
 
+    record_encoding = requests.get(url).encoding
     records = get_records(url)
 
     xml_list = []
     for record in records:
         set_spec = record.xpath('ns0:header/ns0:setSpec/node()', namespaces=NAMESPACES)[0]
         doc_id = record.xpath('ns0:header/ns0:identifier/node()', namespaces=NAMESPACES)[0]
-        record_string = etree.tostring(record, encoding="UTF-8")
+        record_string = etree.tostring(record, encoding=record_encoding)
 
         xml_list.append(RawDocument({
                     'doc': record_string,
                     'source': NAME,
-                    'docID': doc_id,
+                    'docID': copy_to_unicode(doc_id),
                     'filetype': 'xml'
                 }))
 
@@ -81,7 +96,7 @@ def get_contributors(record):
 
 def get_tags(record):
     tags = record.xpath('//dc:subject/node()', namespaces=NAMESPACES)
-    return [tag.lower() for tag in tags]
+    return [copy_to_unicode(tag.lower()) for tag in tags]
 
 def get_ids(record, doc):
     serviceID = doc.get('docID')
@@ -94,7 +109,7 @@ def get_ids(record, doc):
         if 'doi' in identifier:
             doi = identifier
 
-    return {'serviceID': serviceID, 'url': url, 'doi': ''}
+    return {'serviceID': serviceID, 'url': copy_to_unicode(url), 'doi': copy_to_unicode(doi)}
 
 def get_properties(record):
     publisher = record.xpath('//dc:publisher/node()', namespaces=NAMESPACES)
@@ -105,19 +120,24 @@ def get_properties(record):
         'type': type,
         'source': source,
         'format': format,
-        'publisherInfo': {
-            'publisher': publisher,
+        'publisher': publisher,
         },
     }
+
+    for key, value in properties.iteritems():
+        properties[key] = copy_to_unicode(value)
+
     return properties
 
 def get_date_created(record):
     date_created = (record.xpath('ns0:metadata/oai_dc:dc/dc:date/node()', namespaces=NAMESPACES) or [''])[0]
-    return parse(date_created).isoformat()
+    date = parse(date_created).isoformat()
+    return copy_to_unicode(date)
 
 def get_date_updated(record):
     dateupdated = (record.xpath('ns0:header/ns0:datestamp/node()', namespaces=NAMESPACES) or [''])[0]
-    return parse(dateupdated).isoformat()
+    date = parse(dateupdated).isoformat()
+    return copy_to_unicode(date)
 
 def normalize(raw_doc, timestamp):
     doc = raw_doc.get('doc')
@@ -135,20 +155,19 @@ def normalize(raw_doc, timestamp):
             return None
 
     title = record.xpath('//dc:title/node()', namespaces=NAMESPACES)[0]
-
     description = (record.xpath('ns0:metadata/oai_dc:dc/dc:description/node()', namespaces=NAMESPACES) or [''])[0]
 
     normalized_dict = {
-        'title': title,
+        'title': copy_to_unicode(title),
         'contributors': get_contributors(record),
         'properties': get_properties(record),
-        'description': description,
+        'description': copy_to_unicode(description),
         'tags': get_tags(record),
         'id': get_ids(record,raw_doc),
         'source': NAME,
         'dateUpdated': get_date_updated(record),
         'dateCreated': get_date_created(record),
-        'timestamp': str(timestamp),
+        'timestamp': timestamp,
     }
 
     return NormalizedDocument(normalized_dict)
