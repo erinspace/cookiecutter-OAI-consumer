@@ -112,15 +112,15 @@ def get_ids(record, doc):
     return {'serviceID': serviceID, 'url': copy_to_unicode(url), 'doi': copy_to_unicode(doi)}
 
 def get_properties(record):
-    publisher = record.xpath('//dc:publisher/node()', namespaces=NAMESPACES)
-    source = record.xpath('//dc:source/node()', namespaces=NAMESPACES)
-    type = record.xpath('//dc:type/node()', namespaces=NAMESPACES)
-    format = record.xpath('//dc:format/node()', namespaces=NAMESPACES)
+    publisher = (record.xpath('//dc:publisher/node()', namespaces=NAMESPACES) or [''])[0]
+    source = (record.xpath('//dc:source/node()', namespaces=NAMESPACES) or [''])[0]
+    record_type = (record.xpath('//dc:type/node()', namespaces=NAMESPACES) or [''])[0]
+    record_format = (record.xpath('//dc:format/node()', namespaces=NAMESPACES) or [''])[0]
     properties = {
-        'type': type,
-        'source': source,
-        'format': format,
         'publisher': publisher
+        'source': source,
+        'type': record_type,
+        'format': record_format,
     }
 
     for key, value in properties.iteritems():
