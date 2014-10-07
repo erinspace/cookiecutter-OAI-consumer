@@ -117,10 +117,10 @@ def get_properties(record):
     record_type = (record.xpath('//dc:type/node()', namespaces=NAMESPACES) or [''])[0]
     record_format = (record.xpath('//dc:format/node()', namespaces=NAMESPACES) or [''])[0]
     properties = {
-        'publisher': publisher
+        'publisher': publisher,
         'source': source,
         'type': record_type,
-        'format': record_format,
+        'format': record_format
     }
 
     for key, value in properties.iteritems():
@@ -129,7 +129,7 @@ def get_properties(record):
     return properties
 
 def get_date_created(record):
-    date_created = (record.xpath('ns0:metadata/oai_dc:dc/dc:date/node()', namespaces=NAMESPACES) or [''])[0]
+    date_created = (record.xpath('//dc:date/node()', namespaces=NAMESPACES) or [''])[0]
     date = parse(date_created).isoformat()
     return copy_to_unicode(date)
 
