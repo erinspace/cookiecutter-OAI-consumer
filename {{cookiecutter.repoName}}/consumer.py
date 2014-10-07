@@ -138,7 +138,7 @@ def get_date_updated(record):
     date = parse(dateupdated).isoformat()
     return copy_to_unicode(date)
 
-def normalize(raw_doc, timestamp):
+def normalize(raw_doc):
     doc = raw_doc.get('doc')
     record = etree.XML(doc)
 
@@ -166,7 +166,6 @@ def normalize(raw_doc, timestamp):
         'source': NAME,
         'dateUpdated': get_date_updated(record),
         'dateCreated': get_date_created(record),
-        'timestamp': timestamp
     }
 
     return NormalizedDocument(normalized_dict)
