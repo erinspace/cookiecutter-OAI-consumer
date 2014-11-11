@@ -141,7 +141,10 @@ def get_properties(record):
     }
 
     for key, value in properties.iteritems():
-        properties[key] = copy_to_unicode(value)
+        if isinstance(value, list):
+            properties[key] = list_to_unicode(value)
+        else:
+            properties[key] = copy_to_unicode(value)
 
     return properties
 
